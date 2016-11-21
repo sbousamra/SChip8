@@ -6,6 +6,7 @@ mainClass := Some("challenges.Challenges")
 
 libraryDependencies ++= Seq(
   "org.scalaz"                  %% "scalaz-core"                    % "7.1.5",
-  "org.scalatest"               %% "scalatest"                      % "2.2.1" % "test",
+  "org.scalactic"               %% "scalactic"                      % "3.0.0",
+  "org.scalatest"               %% "scalatest"                      % "3.0.0"  % "test",
   "org.scalacheck"              %% "scalacheck"                     % "1.12.1" % "test"
 )
