@@ -1,4 +1,4 @@
-//package SChip8
+//package sbousamra.schip8
 //
 //case class Screen(color: Int, width: Int, height: Int, scalingFactor: Int)
 //

@@ -1,14 +1,6 @@
-package SChip8
+package sbousamra.schip8
 
-object SChip8 {
-
-  def main(args: Array[String]) {
-    val emulator: Emulator = Emulator.createEmulator
-    emulator.run
-  }
-}
-
-case class Emulator (
+case class Emulator(
   memory: Memory,
   programCounter: Int,
   stackPointer: Int,
@@ -30,10 +22,11 @@ case class Emulator (
   }
 
   def executeOpcode(emulator: Emulator): Emulator = {
-    val decodedOpcode = emulator.getRawOpcode & 0xf000
+    val rawOpcode = emulator.getRawOpcode
+    val decodedOpcode = rawOpcode & 0xf000
     val instruction = decodedOpcode match {
 //      case 0x0000 => Opcodes._0NNN(emulator)
-      case 0x1000 => Opcodes._1NNN(emulator)
+      case 0x1000 => Opcodes._1NNN(emulator, rawOpcode)
 //      case 0x2000 => Opcodes._2NNN(emulator)
 //      case 0x3000 => Opcodes._3XKK(emulator)
 //      case 0x4000 => Opcodes._4XKK(emulator)
@@ -49,29 +42,6 @@ case class Emulator (
 //      case 0xe000 => Opcodes._E000(emulator)
     }
     executeOpcode(instruction)
-  }
-}
-
-object Opcodes {
-  def _1NNN(emulator: Emulator) = {
-    val newProgramCounter = (emulator.getRawOpcode & 0x0fff)
-    val newEmulator = emulator.copy(programCounter = newProgramCounter)
-    newEmulator
-  }
-
-  def _6XKK(emulator: Emulator) = {
-    val target = (emulator.getRawOpcode & 0x0f00) >> 8
-    val newvRegister = emulator.vRegister.updated(target, (emulator.getRawOpcode & 0x00ff))
-    val newProgramCounter = emulator.programCounter + 2
-    val newEmulator = emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-    newEmulator
-  }
-
-  def _ANNN(emulator: Emulator) = {
-    val newiRegister = emulator.getRawOpcode & 0x0fff
-    val newProgramCounter = emulator.programCounter + 2
-    val newEmulator = emulator.copy(iRegister = newiRegister, programCounter = newProgramCounter)
-    newEmulator
   }
 }
 
