@@ -31,11 +31,11 @@ case class Emulator(
 //      case 0x3000 => Opcodes._3XKK(emulator)
 //      case 0x4000 => Opcodes._4XKK(emulator)
 //      case 0x5000 => Opcodes._5XYO(emulator)
-      case 0x6000 => Opcodes._6XKK(emulator)
+      case 0x6000 => Opcodes._6XKK(emulator, rawOpcode)
 //      case 0x7000 => Opcodes._7XKK(emulator)
 //      case 0x8000 => Opcodes._8XYN(emulator)
 //      case 0x9000 => Opcodes._9XY0(emulator)
-      case 0xa000 => Opcodes._ANNN(emulator)
+      case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)
 //      case 0xd000 => Opcodes._DXYN(emulator)
 //      case 0xc000 => Opcodes._CXKK(emulator)
 //      case 0xf000 => Opcodes._F000(emulator)
@@ -49,7 +49,7 @@ object Emulator {
 
   def createEmulator: Emulator = {
     Emulator(
-      memory = Memory.loadRom("C:\\Users\\Administrator\\Desktop\\Programming\\SChip8\\TETRIS"),
+      memory = Memory.loadRom("C:\\Users\\Administrator\\Desktop\\Programming\\SChip8\\src\\main\\resources\\roms\\TETRIS"),
       programCounter = 0x200,
       stackPointer = 0,
       stack = List.fill(16)(0),
