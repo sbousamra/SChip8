@@ -8,4 +8,4 @@ object SChip8 {
   }
 }
 
-//doms a fgt
+//doms a fgt.
