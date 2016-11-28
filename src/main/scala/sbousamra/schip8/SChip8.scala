@@ -7,3 +7,5 @@ object SChip8 {
     loadedRom.run
   }
 }
+
+//doms a fgt
