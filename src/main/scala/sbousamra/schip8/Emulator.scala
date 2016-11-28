@@ -61,8 +61,8 @@ object Emulator {
     )
   }
 
-  def loadRom: Emulator = {
-    val rom = Memory.loadRomIntoMemory("C:\\Users\\Administrator\\Desktop\\Programming\\SChip8\\src\\main\\resources\\roms\\TETRIS")
-    createEmulator.copy(memory = rom)
+  def loadRom(rom: String): Emulator = {
+    val loadedRom = Memory.loadRomIntoMemory(rom)
+    createEmulator.copy(memory = loadedRom)
   }
 }
