@@ -4,7 +4,7 @@ object SChip8 {
 
   def main(args: Array[String]) {
     val emulator: Emulator = Emulator.createEmulator
-    val loadedRom: Emulator = emulator.loadRom
+    val loadedRom: Emulator = Emulator.loadRom(emulator)
     loadedRom.run
   }
 }

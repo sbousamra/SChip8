@@ -43,11 +43,6 @@ case class Emulator(
     }
     executeOpcode(instruction)
   }
-
-  def loadRom: Emulator = {
-    val rom = Memory.loadRomIntoMemory("C:\\Users\\Administrator\\Desktop\\Programming\\SChip8\\src\\main\\resources\\roms\\TETRIS")
-    this.copy(memory = rom)
-  }
 }
 
 object Emulator {
@@ -64,5 +59,10 @@ object Emulator {
       delayTimer = 0,
       keyInput = List.fill(16)(0)
     )
+  }
+
+  def loadRom(emulator: Emulator): Emulator = {
+    val rom = Memory.loadRomIntoMemory("C:\\Users\\Administrator\\Desktop\\Programming\\SChip8\\src\\main\\resources\\roms\\TETRIS")
+    emulator.copy(memory = rom)
   }
 }
