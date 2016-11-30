@@ -33,7 +33,9 @@ case class Emulator(
           case 0x00ee => Opcodes._00EE(emulator, rawOpcode)
         }
       case 0x1000 => Opcodes._1NNN(emulator, rawOpcode)
-      case 0x2000 => Opcodes._2NNN(emulator, rawOpcode)
+      case 0x2000 => println(rawOpcode)
+        Opcodes._2NNN(emulator, rawOpcode)
+
 //      case 0x3000 => Opcodes._3XKK(emulator)
 //      case 0x4000 => Opcodes._4XKK(emulator)
 //      case 0x5000 => Opcodes._5XYO(emulator)

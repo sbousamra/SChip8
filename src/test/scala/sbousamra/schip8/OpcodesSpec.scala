@@ -16,6 +16,16 @@ class OpcodesSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("_2NNN") {
+    it("should increment the stack pointer, then put the current program counter on the top of the stack. Then set program counter to nnn.") {
+      val emulatorBefore = getTestingEmulator
+      val emulatorAfter = Opcodes._2NNN(emulatorBefore, 0x2123)
+      emulatorAfter.stackPointer should be (emulatorBefore.stackPointer + 1)
+      emulatorAfter.stack(emulatorAfter.stackPointer) should be (emulatorBefore.programCounter)
+      emulatorAfter.programCounter should be (emulatorBefore.getRawOpcode & 0x0fff)
+    }
+  }
+
   describe("_6XKK") {
     it("should put the value kk into register Vx and add 2 to program counter") {
       val emulatorBefore = getTestingEmulator
