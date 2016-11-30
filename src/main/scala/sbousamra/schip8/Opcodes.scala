@@ -24,7 +24,7 @@ object Opcodes {
 
   def _2NNN(emulator: Emulator, rawOpcode: Int): Emulator = {
     val newStackPointer = emulator.stackPointer + 1
-    val newStack = emulator.stack.updated(newStackPointer, emulator.programCounter)
+    val newStack = emulator.stack.updated(emulator.stack.last, emulator.programCounter)
     val newProgramCounter = (rawOpcode & 0x0fff)
     val newEmulator = emulator.copy(stackPointer = newStackPointer, stack = newStack, programCounter = newProgramCounter)
     newEmulator

@@ -22,7 +22,7 @@ class OpcodesSpec extends FunSpec with Matchers {
       val emulatorAfter = Opcodes._2NNN(emulatorBefore, 0x2123)
       emulatorAfter.stackPointer should be (emulatorBefore.stackPointer + 1)
       emulatorAfter.stack(emulatorAfter.stackPointer) should be (emulatorBefore.programCounter)
-      emulatorAfter.programCounter should be (emulatorBefore.getRawOpcode & 0x0fff)
+      emulatorAfter.programCounter should be (0x0123)
     }
   }
 
