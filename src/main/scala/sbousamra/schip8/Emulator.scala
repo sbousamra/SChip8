@@ -9,7 +9,8 @@ case class Emulator(
   iRegister: Int,
   soundTimer: Int,
   delayTimer: Int,
-  keyInput: List[Int]
+  keyInput: List[Int],
+  screen: List[List[Int]]
 ) {
 
   def run: Unit = {
@@ -25,9 +26,14 @@ case class Emulator(
     val rawOpcode = emulator.getRawOpcode
     val decodedOpcode = rawOpcode & 0xf000
     val instruction = decodedOpcode match {
-//      case 0x0000 => Opcodes._0NNN(emulator)
+      case 0x0000 =>
+        val zeroDecodedOpcode = rawOpcode & 0x00ff
+        zeroDecodedOpcode match {
+          case 0x00e0 => Opcodes._00E0(emulator, rawOpcode)
+          case 0x00ee => Opcodes._00EE(emulator, rawOpcode)
+        }
       case 0x1000 => Opcodes._1NNN(emulator, rawOpcode)
-//      case 0x2000 => Opcodes._2NNN(emulator)
+      case 0x2000 => Opcodes._2NNN(emulator, rawOpcode)
 //      case 0x3000 => Opcodes._3XKK(emulator)
 //      case 0x4000 => Opcodes._4XKK(emulator)
 //      case 0x5000 => Opcodes._5XYO(emulator)
@@ -57,7 +63,8 @@ object Emulator {
       iRegister = 0,
       soundTimer = 0,
       delayTimer = 0,
-      keyInput = List.fill(16)(0)
+      keyInput = List.fill(16)(0),
+      screen = List.fill(32)(List.fill(64)(0))
     )
   }
 
