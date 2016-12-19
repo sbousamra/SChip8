@@ -1,10 +1,23 @@
-//package sbousamra.schip8
-//
-//case class Screen(color: Int, width: Int, height: Int, scalingFactor: Int)
-//
-//object Screen = {
-//
-//  def drawImage(xCoordinate: Int, yCoordinate: Int, rawopcode: Int): Image = {
-//    ???
-//  }
-//}
+package sbousamra.schip8
+
+case class Screen(width: Int, height: Int, scalingFactor: Int, data: List[List[Boolean]]) {
+
+  def getCoordinate(xCoordinate: Int, yCoordinate: Int): Boolean = {
+    data(yCoordinate)(xCoordinate)
+  }
+
+  def setCoordinate(xCoordinate: Int, yCoordinate: Int, pixel: Boolean): List[Boolean] = {
+    data(yCoordinate).updated(xCoordinate, pixel)
+  }
+}
+object Screen {
+
+  def emptyScreen: Screen = {
+    val emptyData = List.fill(32)(List.fill(64)(false))
+    Screen(64, 32, 20, emptyData)
+  }
+
+  def drawImage(xCoordinate: Int, yCoordinate: Int, rawopcode: Int): Screen = {
+    ???
+  }
+}

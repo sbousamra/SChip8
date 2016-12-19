@@ -1,5 +1,7 @@
 package sbousamra.schip8
 
+import scala.runtime.RichInt
+
 case class Emulator(
   memory: Memory,
   programCounter: Int,
@@ -10,7 +12,7 @@ case class Emulator(
   soundTimer: Int,
   delayTimer: Int,
   keyInput: List[Int],
-  screen: List[List[Int]]
+  screen: Screen
 ) {
 
   def run: Unit = {
@@ -29,7 +31,7 @@ case class Emulator(
   def executeOpcode(emulator: Emulator): Emulator = {
     val rawOpcode = emulator.getRawOpcode
     val decodedOpcode = rawOpcode & 0xf000
-    println(rawOpcode)
+    println(new RichInt(rawOpcode).toHexString)
     val instruction = decodedOpcode match {
       case 0x0000 =>
         val zeroDecodedOpcode = rawOpcode & 0x00ff
@@ -39,17 +41,26 @@ case class Emulator(
         }
       case 0x1000 => Opcodes._1NNN(emulator, rawOpcode)
       case 0x2000 => Opcodes._2NNN(emulator, rawOpcode)
-//      case 0x3000 => Opcodes._3XKK(emulator)
-//      case 0x4000 => Opcodes._4XKK(emulator)
+      case 0x3000 => Opcodes._3XKK(emulator, rawOpcode)
+      case 0x4000 => Opcodes._4XKK(emulator, rawOpcode)
 //      case 0x5000 => Opcodes._5XYO(emulator)
       case 0x6000 => Opcodes._6XKK(emulator, rawOpcode)
       case 0x7000 => Opcodes._7XKK(emulator, rawOpcode)
-//      case 0x8000 => Opcodes._8XYN(emulator)
-//      case 0x9000 => Opcodes._9XY0(emulator)
+      case 0x8000 =>
+        val eightDecodedOpcode = rawOpcode & 0xf00f
+        eightDecodedOpcode match {
+          case 0x8000 => Opcodes._8XY0(emulator, rawOpcode)
+        }
+      case 0x9000 => Opcodes._9XY0(emulator, rawOpcode)
       case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)
-//      case 0xd000 => Opcodes._DXYN(emulator)
-//      case 0xc000 => Opcodes._CXKK(emulator)
-//      case 0xf000 => Opcodes._F000(emulator)
+      case 0xd000 => Opcodes._DXYN(emulator, rawOpcode)
+      case 0xc000 => Opcodes._CXKK(emulator, rawOpcode)
+      case 0xf000 =>
+        val fDecodedOpcode = (rawOpcode & 0xf0ff)
+        fDecodedOpcode match {
+          case 0xf01e => Opcodes._FX1E(emulator, rawOpcode)
+          case 0xf015 => Opcodes._FX15(emulator, rawOpcode)
+        }
 //      case 0xe000 => Opcodes._E000(emulator)
     }
     executeOpcode(instruction)
@@ -69,7 +80,7 @@ object Emulator {
       soundTimer = 0,
       delayTimer = 0,
       keyInput = List.fill(16)(0),
-      screen = List.fill(32)(List.fill(64)(0))
+      screen = Screen.emptyScreen
     )
   }
 
