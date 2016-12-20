@@ -99,33 +99,38 @@ object Opcodes {
   }
 
   def _DXYN(emulator: Emulator, rawOpcode: Int) = {
-    val source = (rawOpcode & 0x0f00) >> 8
-    val target = (rawOpcode & 0x00f0) >> 4
-    val height = (rawOpcode & 0x000f)
-    val xCoordinate = emulator.vRegister(source) % 65
-    val yCoordinate = emulator.vRegister(target) % 33
-    val resetvRegister = emulator.vRegister.updated(0xf, 0)
-    val ySpriteRange = Range(0, height)
-    val xSpriteRange = Range(0, 8)
-    val ySprites = ySpriteRange.map (yOffset => (emulator.memory.data(yOffset + emulator.iRegister)))
-    val xSprites = ySprites.map (yOffset => xSpriteRange.map (xOffset => (yOffset, xOffset)))
-    val newProgramCounter = emulator.programCounter + 2
-    emulator.copy(programCounter = newProgramCounter)
-//          val xPixelPos = xCoordinate + x
-//          val yPixelPos = yCoordinate + y
-//          val bitFromScreen = emulator.screen.getCoordinate(xPixelPos, yPixelPos)
-//          bitFromScreen match {
-//            case 1 => val newvRegister = emulator.vRegister.updated(0xf, 1)
-//                      val newEmulator = emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-//                      newEmulator
-//            case _ => val setNewCoordinates = emulator.screen.setCoordinate(xPixelPos, yPixelPos, (bitFromScreen ^ 1))
-//                      val newScreenData = emulator.screen.data
-//                        .map (y =>  setNewCoordinates)
-//                      val newScreen = emulator.screen.copy(data = newScreenData)
-//                      val newEmulator = emulator.copy(screen = newScreen, programCounter = newProgramCounter)
-//                      newEmulator
-//          }
+    val coordx = emulator.vRegister((rawOpcode & 0x0f00) >> 8)
+    val coordy = emulator.vRegister((rawOpcode & 0x00f0) >> 4)
+    val height = rawOpcode & 0x000F
+    var carryFlag = 0
+    var screen = emulator.screen
+
+    for (yline <- 0 until height) {
+      val data = emulator.memory.data(emulator.iRegister + yline)
+      var xpixelinv = 8
+      for (xpixel <- 0 until 8) {
+        xpixelinv -= 1
+        val mask = 1 << xpixelinv
+        if ((data & mask) != 0) {
+          val x = coordx + xpixel
+          val y = coordy + yline
+          if ((x < 64) && (y < 32)) {
+            if (screen.data(x)(y) == 1) {
+              carryFlag = 1
+            }
+            screen.data(x)(y) = !screen.data(x)(y) //flip the bool
+          }
+        }
+      }
     }
+
+    val newVRegister = emulator.vRegister.updated(0xF, carryFlag)
+
+    emulator.copy(
+      vRegister = newVRegister,
+      screen = screen.copy()
+    )
+  }
 
   def _FX1E(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
@@ -147,4 +152,4 @@ object Opcodes {
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(delayTimer = newDelayTimer, programCounter = newProgramCounter)
   }
-  }
+}
