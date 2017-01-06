@@ -18,10 +18,18 @@ case class SChip8(emulator: Emulator) extends BasicGame("schip8") {
   }
 
   override def update(container: GameContainer, delta: Int): Unit = {
-    if (Random.nextInt(100) > 50) {
-      name = "dom"
+    // if (Random.nextInt(100) > 50) {
+    //   name = "dom"
+    // } else {
+    //   name = "bass"
+    // }
+
+    if (Random.nextBool) {
+      name = "Bro"
+    } else if (false) {
+      name = "BOB"
     } else {
-      name = "bass"
+      name = "Dom"
     }
   }
 
