@@ -30,8 +30,19 @@ object Opcodes {
 
   def _3XKK(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
-    val target = (rawOpcode & 0x00ff) >> 8
+    val target = (rawOpcode & 0x00ff)
     if (emulator.vRegister(source) == (target)) {
+      val newProgramCounter = emulator.programCounter + 4
+      emulator.copy(programCounter = newProgramCounter)
+    } else {
+      val newProgramCounter = emulator.programCounter + 2
+      emulator.copy(programCounter = newProgramCounter)
+    }
+  }
+
+  def _4XKK(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    if (emulator.vRegister(source) != (rawOpcode & 0x00ff)) {
       val newProgramCounter = emulator.programCounter + 4
       emulator.copy(programCounter = newProgramCounter)
     } else {
@@ -45,17 +56,6 @@ object Opcodes {
     val newvRegister = emulator.vRegister.updated(target, (rawOpcode & 0x00ff))
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-  }
-
-  def _4XKK(emulator: Emulator, rawOpcode: Int): Emulator = {
-    val source = (rawOpcode & 0x0f00) >> 8
-    if (emulator.vRegister(source) != (rawOpcode & 0x00ff)) {
-      val newProgramCounter = emulator.programCounter + 4
-      emulator.copy(programCounter = newProgramCounter)
-    } else {
-      val newProgramCounter = emulator.programCounter + 2
-      emulator.copy(programCounter = newProgramCounter)
-    }
   }
 
   def _7XKK(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -91,41 +91,60 @@ object Opcodes {
     emulator.copy(iRegister = newiRegister, programCounter = newProgramCounter)
   }
 
-  def _CXKK(emulator: Emulator, rawOpcode: Int): Emulator = {
+  def _CXKK(emulator: Emulator, rawOpcode: Int, randomInt: => Int): Emulator = {
     val target = (rawOpcode & 0x0f00) >> 8
-    val newvRegister = emulator.vRegister.updated(target, (Random.nextInt(256) & (rawOpcode & 0x00ff)))
+    val newvRegister = emulator.vRegister.updated(target, (randomInt & (rawOpcode & 0x00ff)))
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
   }
 
   def _DXYN(emulator: Emulator, rawOpcode: Int) = {
-    val source = (rawOpcode & 0x0f00) >> 8
-    val target = (rawOpcode & 0x00f0) >> 4
-    val height = (rawOpcode & 0x000f)
-    val xCoordinate = emulator.vRegister(source) % 65
-    val yCoordinate = emulator.vRegister(target) % 33
-    val resetvRegister = emulator.vRegister.updated(0xf, 0)
-    val ySpriteRange = Range(0, height)
-    val xSpriteRange = Range(0, 8)
-    val ySprites = ySpriteRange.map (yOffset => (emulator.memory.data(yOffset + emulator.iRegister)))
-    val xSprites = ySprites.map (yOffset => xSpriteRange.map (xOffset => (yOffset, xOffset)))
-    val newProgramCounter = emulator.programCounter + 2
-    emulator.copy(programCounter = newProgramCounter)
-//          val xPixelPos = xCoordinate + x
-//          val yPixelPos = yCoordinate + y
-//          val bitFromScreen = emulator.screen.getCoordinate(xPixelPos, yPixelPos)
-//          bitFromScreen match {
-//            case 1 => val newvRegister = emulator.vRegister.updated(0xf, 1)
-//                      val newEmulator = emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-//                      newEmulator
-//            case _ => val setNewCoordinates = emulator.screen.setCoordinate(xPixelPos, yPixelPos, (bitFromScreen ^ 1))
-//                      val newScreenData = emulator.screen.data
-//                        .map (y =>  setNewCoordinates)
-//                      val newScreen = emulator.screen.copy(data = newScreenData)
-//                      val newEmulator = emulator.copy(screen = newScreen, programCounter = newProgramCounter)
-//                      newEmulator
-//          }
+    val xCoordinate = emulator.vRegister((rawOpcode & 0x0f00) >> 8) % 64
+    val yCoordinate = emulator.vRegister((rawOpcode & 0x00f0) >> 4) % 32
+    val height = rawOpcode & 0x000F
+    var carryFlag = 0
+    var newScreen = emulator.screen
+
+    for (yline <- 0 until height) {
+      val sprite = emulator.memory.data(emulator.iRegister + yline)
+      for (xpixel <- 0 until 8) {
+        if ((sprite & (0x80 >> xpixel)) != 0) {
+          val xPixelPosition = xCoordinate + xpixel
+          val yPixelPosition = yCoordinate + yline
+          val bitFromScreen = newScreen.getCoordinate(xPixelPosition, yPixelPosition) == true
+          val newxData = newScreen.setCoordinate(xPixelPosition, yPixelPosition, bitFromScreen ^ true)
+          val newScreenData = newScreen.data.updated(yPixelPosition, newxData)
+          newScreen = emulator.screen.copy(data = newScreenData)
+          if (bitFromScreen == true) {
+            carryFlag = 1
+          }
+        }
+      }
     }
+    val newvRegister = emulator.vRegister.updated(0xf, carryFlag)
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(vRegister = newvRegister, screen = newScreen, programCounter = newProgramCounter)
+  }
+
+  def _EXA1(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val newProgramCounter = if (emulator.keyInput(emulator.vRegister(source)) == 0) {
+      emulator.programCounter + 4
+    } else {
+      emulator.programCounter + 2
+    }
+    emulator.copy(programCounter = newProgramCounter)
+  }
+
+  def _EX9E(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val newProgramCounter = if (emulator.keyInput(emulator.vRegister(source)) != 0) {
+      emulator.programCounter + 4
+    } else {
+      emulator.programCounter + 2
+    }
+    emulator.copy(programCounter = newProgramCounter)
+  }
 
   def _FX1E(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
@@ -147,4 +166,11 @@ object Opcodes {
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(delayTimer = newDelayTimer, programCounter = newProgramCounter)
   }
+
+  def _FX07(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val target = (rawOpcode & 0x0f00) >> 8
+    val newvRegister = emulator.vRegister.updated(target, emulator.delayTimer)
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
   }
+}

@@ -1,6 +1,8 @@
 package sbousamra.schip8
 
+import scala.annotation.tailrec
 import scala.runtime.RichInt
+import scala.util.Random
 
 case class Emulator(
   memory: Memory,
@@ -28,10 +30,10 @@ case class Emulator(
     stack.last
   }
 
-  def executeOpcode(emulator: Emulator): Emulator = {
+  @tailrec
+  private def executeOpcode(emulator: Emulator): Emulator = {
     val rawOpcode = emulator.getRawOpcode
     val decodedOpcode = rawOpcode & 0xf000
-    println(new RichInt(rawOpcode).toHexString)
     val instruction = decodedOpcode match {
       case 0x0000 =>
         val zeroDecodedOpcode = rawOpcode & 0x00ff
@@ -54,14 +56,20 @@ case class Emulator(
       case 0x9000 => Opcodes._9XY0(emulator, rawOpcode)
       case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)
       case 0xd000 => Opcodes._DXYN(emulator, rawOpcode)
-      case 0xc000 => Opcodes._CXKK(emulator, rawOpcode)
+      case 0xc000 => Opcodes._CXKK(emulator, rawOpcode, Random.nextInt(256))
       case 0xf000 =>
         val fDecodedOpcode = (rawOpcode & 0xf0ff)
         fDecodedOpcode match {
           case 0xf01e => Opcodes._FX1E(emulator, rawOpcode)
           case 0xf015 => Opcodes._FX15(emulator, rawOpcode)
+          case 0xf007 => Opcodes._FX07(emulator, rawOpcode)
         }
-//      case 0xe000 => Opcodes._E000(emulator)
+      case 0xe000 =>
+        val eDecodedOpcode = (rawOpcode & 0xf0ff)
+        eDecodedOpcode match {
+          case 0xe0a1 => Opcodes._EXA1(emulator, rawOpcode)
+          case 0xe09e => Opcodes._EX9E(emulator, rawOpcode)
+        }
     }
     executeOpcode(instruction)
   }
