@@ -18,7 +18,12 @@ case class Emulator(
 ) {
 
   def run: Unit = {
-    executeOpcode(this)
+    loop
+  }
+
+  @tailrec
+  private def loop: Unit = {
+    executeOpcode(this).loop
   }
 
   def getRawOpcode = {
@@ -30,11 +35,10 @@ case class Emulator(
     stack.last
   }
 
-  @tailrec
-  private def executeOpcode(emulator: Emulator): Emulator = {
+  def executeOpcode(emulator: Emulator): Emulator = {
     val rawOpcode = emulator.getRawOpcode
     val decodedOpcode = rawOpcode & 0xf000
-    val instruction = decodedOpcode match {
+    decodedOpcode match {
       case 0x0000 =>
         val zeroDecodedOpcode = rawOpcode & 0x00ff
         zeroDecodedOpcode match {
@@ -71,7 +75,6 @@ case class Emulator(
           case 0xe09e => Opcodes._EX9E(emulator, rawOpcode)
         }
     }
-    executeOpcode(instruction)
   }
 }
 

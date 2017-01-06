@@ -4,7 +4,7 @@ import org.newdawn.slick._
 
 import scala.util.Random
 
-case class SChip8(emulator: Emulator) extends BasicGame("schip8") {
+case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
   var name = "bass"
   def run: Unit = {
     val appgc = new AppGameContainer(this)
@@ -14,19 +14,15 @@ case class SChip8(emulator: Emulator) extends BasicGame("schip8") {
   }
 
   override def init(container: GameContainer): Unit = {
-    println("starting game")
+    // do nothing because 
   }
 
   override def update(container: GameContainer, delta: Int): Unit = {
-    if (Random.nextInt(100) > 50) {
-      name = "fag"
-    } else {
-      name = "dom"
-    }
+    emulator = emulator.executeOpcode(emulator)
   }
 
   override def render(container: GameContainer, g: Graphics): Unit = {
-    val tetrisSprite = new Image("src\\main\\resources\\graphics\\1x1pixel.png")
+    //run
   }
 }
 
