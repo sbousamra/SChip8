@@ -27,7 +27,6 @@ case class SChip8(emulator: Emulator) extends BasicGame("schip8") {
 
   override def render(container: GameContainer, g: Graphics): Unit = {
     val tetrisSprite = new Image("src\\main\\resources\\graphics\\1x1pixel.png")
-    tetrisSprite
   }
 }
 

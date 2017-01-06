@@ -99,7 +99,6 @@ object Opcodes {
   }
 
   def _DXYN(emulator: Emulator, rawOpcode: Int) = {
-<<<<<<< HEAD
     val xCoordinate = emulator.vRegister((rawOpcode & 0x0f00) >> 8) % 64
     val yCoordinate = emulator.vRegister((rawOpcode & 0x00f0) >> 4) % 32
     val height = rawOpcode & 0x000F
@@ -143,41 +142,8 @@ object Opcodes {
       emulator.programCounter + 4
     } else {
       emulator.programCounter + 2
-=======
-    val coordx = emulator.vRegister((rawOpcode & 0x0f00) >> 8)
-    val coordy = emulator.vRegister((rawOpcode & 0x00f0) >> 4)
-    val height = rawOpcode & 0x000F
-    var carryFlag = 0
-    var screen = emulator.screen
-
-    for (yline <- 0 until height) {
-      val data = emulator.memory.data(emulator.iRegister + yline)
-      var xpixelinv = 8
-      for (xpixel <- 0 until 8) {
-        xpixelinv -= 1
-        val mask = 1 << xpixelinv
-        if ((data & mask) != 0) {
-          val x = coordx + xpixel
-          val y = coordy + yline
-          if ((x < 64) && (y < 32)) {
-            if (screen.data(x)(y) == 1) {
-              carryFlag = 1
-            }
-            screen.data(x)(y) = !screen.data(x)(y) //flip the bool
-          }
-        }
-      }
->>>>>>> 537962db40c2babb0775bfb1f3040211793eced3
     }
     emulator.copy(programCounter = newProgramCounter)
-  }
-
-    val newVRegister = emulator.vRegister.updated(0xF, carryFlag)
-
-    emulator.copy(
-      vRegister = newVRegister,
-      screen = screen.copy()
-    )
   }
 
   def _FX1E(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -200,7 +166,6 @@ object Opcodes {
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(delayTimer = newDelayTimer, programCounter = newProgramCounter)
   }
-<<<<<<< HEAD
 
   def _FX07(emulator: Emulator, rawOpcode: Int): Emulator = {
     val target = (rawOpcode & 0x0f00) >> 8
@@ -208,6 +173,4 @@ object Opcodes {
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
   }
-=======
->>>>>>> 537962db40c2babb0775bfb1f3040211793eced3
 }
