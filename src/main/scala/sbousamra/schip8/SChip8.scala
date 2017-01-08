@@ -5,7 +5,6 @@ import org.newdawn.slick._
 import scala.util.Random
 
 case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
-  var name = "bass"
   def run: Unit = {
     val appgc = new AppGameContainer(this)
     appgc.setDisplayMode(640, 480, false)
@@ -14,7 +13,7 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
   }
 
   override def init(container: GameContainer): Unit = {
-    // do nothing because 
+    // do nothing
   }
 
   override def update(container: GameContainer, delta: Int): Unit = {
@@ -22,7 +21,15 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
   }
 
   override def render(container: GameContainer, g: Graphics): Unit = {
-    //run
+    val tetrisSpriteOn = new Image("src\\main\\resources\\graphics\\1x1pixel.png")
+    val pixelsOnScreen = emulator.screen.data.zipWithIndex.map {y => y._1.zipWithIndex.map { x =>
+      if (x._1 == true) {
+        val xScalingFactor = (container.getWidth/y._1.length)
+        val yScalingFactor = (container.getHeight/(emulator.screen.data.length))
+        tetrisSpriteOn.draw((x._2 * xScalingFactor), (y._2 * yScalingFactor), xScalingFactor, yScalingFactor)
+      }
+    }
+    }
   }
 }
 
