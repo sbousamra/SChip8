@@ -125,6 +125,22 @@ class OpcodesSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("_8XY4") {
+    it("should add the values of Vx and Vytogether. If the result is greater than 8 bits (i.e., > 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored in Vx") {
+      val emulator = getTestingEmulator
+      val emulatorBeforeCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 100).updated(2, 200))
+      val emulatorBeforeNoCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 10).updated(2, 20))
+      val emulatorAfterCarry = Opcodes._8XY4(emulatorBeforeCarry, 0x8124)
+      val emulatorAfterNoCarry = Opcodes._8XY4(emulatorBeforeNoCarry, 0x8124)
+      emulatorAfterCarry.vRegister(1) should be ((emulatorBeforeCarry.vRegister(1) + emulatorBeforeCarry.vRegister(2) & 0xff))
+      emulatorAfterCarry.vRegister(0xf) should be (1)
+      emulatorAfterNoCarry.vRegister(1) should be (emulatorBeforeNoCarry.vRegister(1) + emulatorBeforeNoCarry.vRegister(2))
+      emulatorAfterNoCarry.vRegister(0xf) should be (0)
+      emulatorAfterCarry.programCounter should be (emulatorBeforeCarry.programCounter + 2)
+      emulatorAfterNoCarry.programCounter should be (emulatorBeforeNoCarry.programCounter + 2)
+    }
+  }
+
   describe("_9XY0") {
     it("should skip next instruction if Vx != Vy else the program counter is increased by 2") {
       val emulatorBefore = getTestingEmulator

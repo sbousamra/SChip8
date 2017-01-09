@@ -32,7 +32,7 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
   }
 
   override def render(container: GameContainer, g: Graphics): Unit = {
-    val tetrisSpriteOn = new Image("src\\main\\resources\\graphics\\1x1pixel.png")
+    val tetrisSpriteOn = new Image("src/main/resources/graphics/1x1pixel.png")
     val pixelsOnScreen = emulator.screen.data.zipWithIndex.map {y =>
       y._1.zipWithIndex.map { x =>
         if (x._1 == true) {
@@ -54,6 +54,6 @@ object SChip8 {
   }
 
   def create(romName: String): SChip8 = {
-    SChip8(Emulator.loadRom("src\\main\\resources\\roms\\" + romName))
+    SChip8(Emulator.loadRom("src/main/resources/roms/" + romName))
   }
 }
