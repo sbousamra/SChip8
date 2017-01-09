@@ -166,4 +166,24 @@ class OpcodesSpec extends FunSpec with Matchers {
       emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
     }
   }
+
+  describe("_FX1E") {
+    it("should add the values of I and Vx and the results are stored in the I register") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 10), iRegister = 5)
+      val emulatorAfter = Opcodes._FX1E(emulatorBefore, 0xf01e)
+      emulatorAfter.iRegister should be (emulatorBefore.iRegister + 10)
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
+
+  describe("_FX15") {
+    it("should set DT equal to the value of Vx") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 20), delayTimer = 15)
+      val emulatorAfter = Opcodes._FX15(emulatorBefore, 0xf015)
+      emulatorAfter.delayTimer should be (emulatorBefore.vRegister(0))
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
 }

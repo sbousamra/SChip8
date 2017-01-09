@@ -42,7 +42,8 @@ object Opcodes {
 
   def _4XKK(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
-    if (emulator.vRegister(source) != (rawOpcode & 0x00ff)) {
+    val target = (rawOpcode & 0x00ff)
+    if (emulator.vRegister(source) != target) {
       val newProgramCounter = emulator.programCounter + 4
       emulator.copy(programCounter = newProgramCounter)
     } else {
@@ -146,6 +147,13 @@ object Opcodes {
     emulator.copy(programCounter = newProgramCounter)
   }
 
+  def _FX07(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val target = (rawOpcode & 0x0f00) >> 8
+    val newvRegister = emulator.vRegister.updated(target, emulator.delayTimer)
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
+  }
+
   def _FX1E(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
     val sourceRegister = emulator.vRegister(source)
@@ -165,12 +173,5 @@ object Opcodes {
     val newDelayTimer = emulator.vRegister(source)
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(delayTimer = newDelayTimer, programCounter = newProgramCounter)
-  }
-
-  def _FX07(emulator: Emulator, rawOpcode: Int): Emulator = {
-    val target = (rawOpcode & 0x0f00) >> 8
-    val newvRegister = emulator.vRegister.updated(target, emulator.delayTimer)
-    val newProgramCounter = emulator.programCounter + 2
-    emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
   }
 }

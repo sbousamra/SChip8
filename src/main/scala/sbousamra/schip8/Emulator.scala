@@ -23,6 +23,11 @@ case class Emulator(
 
   @tailrec
   private def loop: Unit = {
+    println(getRawOpcode.toHexString)
+    println(vRegister)
+    println(programCounter.toHexString)
+    println(delayTimer)
+    println("\n")
     executeOpcode(this).loop
   }
 
