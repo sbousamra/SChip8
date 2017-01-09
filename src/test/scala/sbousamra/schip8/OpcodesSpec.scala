@@ -150,7 +150,7 @@ class OpcodesSpec extends FunSpec with Matchers {
       val emulatorAfterNoCarry = Opcodes._8XY5(emulatorBeforeNoCarry, 0x8125)
       emulatorAfterCarry.vRegister(1) should be ((emulatorBeforeCarry.vRegister(1) - emulatorBeforeCarry.vRegister(2)))
       emulatorAfterCarry.vRegister(0xf) should be (1)
-      emulatorAfterNoCarry.vRegister(1) should be (emulatorBeforeNoCarry.vRegister(1) - emulatorBeforeNoCarry.vRegister(2))
+      emulatorAfterNoCarry.vRegister(1) should be ((emulatorBeforeNoCarry.vRegister(1) - emulatorBeforeNoCarry.vRegister(2)))
       emulatorAfterNoCarry.vRegister(0xf) should be (0)
       emulatorAfterCarry.programCounter should be (emulatorBeforeCarry.programCounter + 2)
       emulatorAfterNoCarry.programCounter should be (emulatorBeforeNoCarry.programCounter + 2)

@@ -116,7 +116,7 @@ object Opcodes {
     val source = (rawOpcode & 0x0f00) >> 8
     val target = (rawOpcode & 0x00f0) >> 4
     val newProgramCounter = emulator.programCounter + 2
-    val intermediatevRegister = emulator.vRegister.updated(target, ((emulator.vRegister(source) - emulator.vRegister(target))))
+    val intermediatevRegister = emulator.vRegister.updated(source, ((emulator.vRegister(source) - emulator.vRegister(target))))
     if ((emulator.vRegister(source) > emulator.vRegister(target))) {
       val newvRegister = intermediatevRegister.updated(0xf, 1)
       emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
