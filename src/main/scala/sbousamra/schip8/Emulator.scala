@@ -62,6 +62,8 @@ case class Emulator(
         eightDecodedOpcode match {
           case 0x8000 => Opcodes._8XY0(emulator, rawOpcode)
           case 0x8001 => Opcodes._8XY1(emulator, rawOpcode)
+          case 0x8002 => Opcodes._8XY2(emulator, rawOpcode)
+          case 0x8003 => Opcodes._8XY3(emulator, rawOpcode)
         }
       case 0x9000 => Opcodes._9XY0(emulator, rawOpcode)
       case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)
