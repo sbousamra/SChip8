@@ -61,6 +61,7 @@ case class Emulator(
         val eightDecodedOpcode = rawOpcode & 0xf00f
         eightDecodedOpcode match {
           case 0x8000 => Opcodes._8XY0(emulator, rawOpcode)
+          case 0x8001 => Opcodes._8XY1(emulator, rawOpcode)
         }
       case 0x9000 => Opcodes._9XY0(emulator, rawOpcode)
       case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)

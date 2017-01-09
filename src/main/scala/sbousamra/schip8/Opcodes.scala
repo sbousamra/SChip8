@@ -74,6 +74,14 @@ object Opcodes {
     emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
   }
 
+  def _8XY1(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val target = (rawOpcode & 0x0f00) >> 8
+    val source = (rawOpcode & 0x00f0) >> 4
+    val newvRegister = emulator.vRegister.updated(target, (emulator.vRegister(target) | emulator.vRegister(source)))
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
+  }
+
   def _9XY0(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
     val target = (rawOpcode & 0x00f0) >> 4

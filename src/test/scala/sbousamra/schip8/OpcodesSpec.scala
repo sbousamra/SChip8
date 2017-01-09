@@ -95,13 +95,15 @@ class OpcodesSpec extends FunSpec with Matchers {
     }
   }
 
-//  describe("_8XY1") {
-//    it("should performs a bitwise OR on the values of Vx and Vy, then store the result in Vx. A bitwise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the result is also 1. Otherwise, it is 0") {
-//      val emulatorBefore = getTestingEmulator
-//      val emulatorAfter = Opcodes._8XY1(emulatorBefore, 0x8121)
-//      emulatorAfter.vRegister()
-//    }
-//  }
+  describe("_8XY1") {
+    it("should performs a bitwise OR on the values of Vx and Vy, then store the result in Vx. A bitwise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the result is also 1. Otherwise, it is 0") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(1, 10).updated(2, 20))
+      val emulatorAfter = Opcodes._8XY1(emulatorBefore, 0x8121)
+      emulatorAfter.vRegister(1) should be (emulatorBefore.vRegister(1) | emulatorBefore.vRegister(2))
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
 
   describe("_9XY0") {
     it("should skip next instruction if Vx != Vy else the program counter is increased by 2") {
