@@ -19,12 +19,12 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
 
   override def update(container: GameContainer, delta: Int): Unit = {
     val newDelayTimer = if (emulator.delayTimer > 0) {
-      (emulator.delayTimer - delta)
+      (emulator.delayTimer - 1)
     } else {
       0
     }
     val newSoundTimer = if (emulator.soundTimer > 0) {
-      (emulator.soundTimer - delta)
+      (emulator.soundTimer - 1)
     } else {
       0
     }
