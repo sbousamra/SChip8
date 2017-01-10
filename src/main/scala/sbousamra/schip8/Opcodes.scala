@@ -139,6 +139,20 @@ object Opcodes {
     }
   }
 
+  def _8XY7(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val target = (rawOpcode & 0x00f0) >> 4
+    val newProgramCounter = emulator.programCounter + 2
+      val intermediatevRegister = emulator.vRegister.updated(source, ((emulator.vRegister(target) - emulator.vRegister(source))))
+    if ((emulator.vRegister(target) > emulator.vRegister(source))) {
+      val newvRegister = intermediatevRegister.updated(0xf, 1)
+      emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
+    } else {
+      val newvRegister = intermediatevRegister.updated(0xf, 0)
+      emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
+    }
+  }
+
   def _9XY0(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
     val target = (rawOpcode & 0x00f0) >> 4

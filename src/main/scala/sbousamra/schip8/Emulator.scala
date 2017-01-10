@@ -66,6 +66,8 @@ case class Emulator(
           case 0x8003 => Opcodes._8XY3(emulator, rawOpcode)
           case 0x8004 => Opcodes._8XY4(emulator, rawOpcode)
           case 0x8005 => Opcodes._8XY5(emulator, rawOpcode)
+          case 0x8006 => Opcodes._8XY6(emulator, rawOpcode)
+          case 0x8007 => Opcodes._8XY7(emulator, rawOpcode)
         }
       case 0x9000 => Opcodes._9XY0(emulator, rawOpcode)
       case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)
