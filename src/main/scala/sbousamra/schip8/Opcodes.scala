@@ -52,6 +52,18 @@ object Opcodes {
     }
   }
 
+  def _5XY0(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val target = (rawOpcode & 0x00f0) >> 4
+    if (emulator.vRegister(source) == emulator.vRegister(target)) {
+      val newProgramCounter = emulator.programCounter + 4
+      emulator.copy(programCounter = newProgramCounter)
+    } else {
+      val newProgramCounter = emulator.programCounter + 2
+      emulator.copy(programCounter = newProgramCounter)
+    }
+  }
+
   def _6XKK(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
     val newvRegister = emulator.vRegister.updated(source, (rawOpcode & 0x00ff))
@@ -130,13 +142,11 @@ object Opcodes {
     val source = (rawOpcode & 0x0f00) >> 8
     val leastSignificantBit = (emulator.vRegister(source) & 1)
     val newProgramCounter = emulator.programCounter + 2
-    if (leastSignificantBit == 1) {
-      val newvRegister = emulator.vRegister.updated(0xf, 1).updated(source, (emulator.vRegister(source)/2))
-      emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-    } else {
-      val newvRegister = emulator.vRegister.updated(0xf, 0).updated(source, (emulator.vRegister(source)/2))
-      emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-    }
+    val newfRegister = if (leastSignificantBit == 1) 1 else 0
+    emulator.copy(
+      vRegister = emulator.vRegister.updated(0xf, newfRegister).updated(source, (emulator.vRegister(source)/2)),
+      programCounter = newProgramCounter
+    )
   }
 
   def _8XY7(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -157,13 +167,11 @@ object Opcodes {
     val source = (rawOpcode & 0x0f00) >> 8
     val mostSignificantBit = (emulator.vRegister(source) >> 7)
     val newProgramCounter = emulator.programCounter + 2
-    if (mostSignificantBit == 1) {
-      val newvRegister = emulator.vRegister.updated(0xf, 1).updated(source, (emulator.vRegister(source) * 2))
-      emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-    } else {
-      val newvRegister = emulator.vRegister.updated(0xf, 0).updated(source, (emulator.vRegister(source) * 2))
-      emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
-    }
+    val newfRegister = if (mostSignificantBit == 1) 1 else 0
+    emulator.copy(
+      vRegister = emulator.vRegister.updated(0xf, newfRegister).updated(source, (emulator.vRegister(source) * 2)),
+      programCounter = newProgramCounter
+    )
   }
 
   def _9XY0(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -182,6 +190,12 @@ object Opcodes {
     val newiRegister = (rawOpcode & 0x0fff)
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(iRegister = newiRegister, programCounter = newProgramCounter)
+  }
+
+  def _BNNN(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val target = (rawOpcode & 0x0fff)
+    val newProgramCounter = target + emulator.vRegister(0)
+    emulator.copy(programCounter = newProgramCounter)
   }
 
   def _CXKK(emulator: Emulator, rawOpcode: Int, randomInt: => Int): Emulator = {

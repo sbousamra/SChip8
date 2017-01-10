@@ -68,10 +68,11 @@ case class Emulator(
           case 0x8005 => Opcodes._8XY5(emulator, rawOpcode)
           case 0x8006 => Opcodes._8XY6(emulator, rawOpcode)
           case 0x8007 => Opcodes._8XY7(emulator, rawOpcode)
-          case 0x8008 => Opcodes._8XYE(emulator, rawOpcode)
+          case 0x800e => Opcodes._8XYE(emulator, rawOpcode)
         }
       case 0x9000 => Opcodes._9XY0(emulator, rawOpcode)
       case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)
+      case 0xb000 => Opcodes._BNNN(emulator, rawOpcode)
       case 0xd000 => Opcodes._DXYN(emulator, rawOpcode)
       case 0xc000 => Opcodes._CXKK(emulator, rawOpcode, Random.nextInt(256))
       case 0xf000 =>

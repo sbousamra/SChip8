@@ -165,6 +165,8 @@ class OpcodesSpec extends FunSpec with Matchers {
       val emulatorBeforeNoCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 2))
       val emulatorAfterCarry = Opcodes._8XY6(emulatorBeforeCarry, 0x8126)
       val emulatorAfterNoCarry = Opcodes._8XY6(emulatorBeforeNoCarry, 0x8126)
+      emulatorAfterCarry.vRegister(1) should be (emulatorBeforeCarry.vRegister(1)/2)
+      emulatorAfterNoCarry.vRegister(1) should be (emulatorBeforeNoCarry.vRegister(1)/2)
       emulatorAfterCarry.vRegister(0xf) should be (1)
       emulatorAfterNoCarry.vRegister(0xf) should be (0)
       emulatorAfterCarry.programCounter should be (emulatorBeforeCarry.programCounter + 2)
@@ -196,6 +198,8 @@ class OpcodesSpec extends FunSpec with Matchers {
       val emulatorBeforeNoCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 5))
       val emulatorAfterCarry = Opcodes._8XYE(emulatorBeforeCarry, 0x812e)
       val emulatorAfterNoCarry = Opcodes._8XYE(emulatorBeforeNoCarry, 0x812e)
+      emulatorAfterCarry.vRegister(1) should be (emulatorBeforeCarry.vRegister(1) * 2)
+      emulatorAfterNoCarry.vRegister(1) should be (emulatorBeforeNoCarry.vRegister(1) * 2)
       emulatorAfterCarry.vRegister(0xf) should be (1)
       emulatorAfterNoCarry.vRegister(0xf) should be (0)
       emulatorAfterCarry.programCounter should be (emulatorBeforeCarry.programCounter + 2)
@@ -221,6 +225,14 @@ class OpcodesSpec extends FunSpec with Matchers {
       val emulatorAfter = Opcodes._ANNN(emulatorBefore, 0xA123)
       emulatorAfter.iRegister should be (0x123)
       emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
+
+  describe("_BNNN") {
+    it("should set the program counter is set to nnn plus the value of V0") {
+      val emulatorBefore = getTestingEmulator
+      val emulatorAfter = Opcodes._BNNN(emulatorBefore, 0xB123)
+      emulatorAfter.programCounter should be (emulatorBefore.vRegister(0) + 0x123)
     }
   }
 
