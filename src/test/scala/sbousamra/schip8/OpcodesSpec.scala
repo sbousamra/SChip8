@@ -172,6 +172,37 @@ class OpcodesSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("_8XY7") {
+    it("should check if Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx") {
+      val emulator = getTestingEmulator
+      val emulatorBeforeCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 100).updated(2, 200))
+      val emulatorBeforeNoCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 20).updated(2, 10))
+      val emulatorAfterCarry = Opcodes._8XY7(emulatorBeforeCarry, 0x8127)
+      val emulatorAfterNoCarry = Opcodes._8XY7(emulatorBeforeNoCarry, 0x8127)
+      emulatorAfterCarry.vRegister(1) should be ((emulatorBeforeCarry.vRegister(2) - emulatorBeforeCarry.vRegister(1)))
+      emulatorAfterCarry.vRegister(0xf) should be (1)
+      emulatorAfterNoCarry.vRegister(1) should be ((emulatorBeforeNoCarry.vRegister(2) - emulatorBeforeNoCarry.vRegister(1)))
+      emulatorAfterNoCarry.vRegister(0xf) should be (0)
+      emulatorAfterCarry.programCounter should be (emulatorBeforeCarry.programCounter + 2)
+      emulatorAfterNoCarry.programCounter should be (emulatorBeforeNoCarry.programCounter + 2)
+    }
+  }
+
+  describe("_8XYE") {
+    it("should check if the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2") {
+      val emulator = getTestingEmulator
+      val mostSignificantBit = 1
+      val emulatorBeforeCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 128))
+      val emulatorBeforeNoCarry = emulator.copy(vRegister = emulator.vRegister.updated(1, 5))
+      val emulatorAfterCarry = Opcodes._8XYE(emulatorBeforeCarry, 0x812e)
+      val emulatorAfterNoCarry = Opcodes._8XYE(emulatorBeforeNoCarry, 0x812e)
+      emulatorAfterCarry.vRegister(0xf) should be (1)
+      emulatorAfterNoCarry.vRegister(0xf) should be (0)
+      emulatorAfterCarry.programCounter should be (emulatorBeforeCarry.programCounter + 2)
+      emulatorAfterNoCarry.programCounter should be (emulatorBeforeNoCarry.programCounter + 2)
+    }
+  }
+
   describe("_9XY0") {
     it("should skip next instruction if Vx != Vy else the program counter is increased by 2") {
       val emulatorBefore = getTestingEmulator
