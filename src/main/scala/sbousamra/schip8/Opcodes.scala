@@ -1,5 +1,10 @@
 package sbousamra.schip8
 
+import java.awt.event.{KeyEvent, KeyListener}
+import java.util.EventListener
+
+import org.newdawn.slick.{AppGameContainer, Input, InputListener}
+
 import scala.util.Random
 
 object Opcodes {
@@ -233,24 +238,30 @@ object Opcodes {
     emulator.copy(vRegister = newvRegister, screen = newScreen, programCounter = newProgramCounter)
   }
 
-  def _EXA1(emulator: Emulator, rawOpcode: Int): Emulator = {
-    val source = (rawOpcode & 0x0f00) >> 8
-    val newProgramCounter = if (emulator.keyInput(emulator.vRegister(source)) == 0) {
-      emulator.programCounter + 4
-    } else {
-      emulator.programCounter + 2
-    }
-    emulator.copy(programCounter = newProgramCounter)
-  }
-
   def _EX9E(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
-    val newProgramCounter = if (emulator.keyInput(emulator.vRegister(source)) != 0) {
-      emulator.programCounter + 4
-    } else {
-      emulator.programCounter + 2
+    val newProgramCounter = emulator.keyPressed match {
+      case Some(key) => if (key == source) {
+        emulator.programCounter + 4
+      } else {
+        emulator.programCounter + 2
+      }
+      case None => emulator.programCounter + 2
     }
-    emulator.copy(programCounter = newProgramCounter)
+    emulator.copy(programCounter = newProgramCounter, keyPressed = None)
+  }
+
+  def _EXA1(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val newProgramCounter = emulator.keyPressed match {
+      case Some(key) => if (key != source) {
+        emulator.programCounter + 4
+      } else {
+        emulator.programCounter + 2
+      }
+      case None => emulator.programCounter + 2
+    }
+    emulator.copy(programCounter = newProgramCounter, keyPressed = None)
   }
 
   def _FX07(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -258,6 +269,24 @@ object Opcodes {
     val newvRegister = emulator.vRegister.updated(source, emulator.delayTimer)
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter)
+  }
+
+  def _FX0A(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    emulator.keyPressed match {
+      case Some(key) =>
+        val newvRegister = emulator.vRegister.updated(source, key)
+        val newProgramCounter = emulator.programCounter + 2
+        emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter, keyPressed = None)
+      case None => emulator
+    }
+  }
+
+  def _FX15(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val newDelayTimer = emulator.vRegister(source)
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(delayTimer = newDelayTimer, programCounter = newProgramCounter)
   }
 
   def _FX1E(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -272,12 +301,5 @@ object Opcodes {
       val newvRegister = emulator.vRegister.updated(0xf, 0)
       emulator.copy(vRegister = newvRegister, iRegister = newiRegister, programCounter = newProgramCounter)
     }
-  }
-
-  def _FX15(emulator: Emulator, rawOpcode: Int): Emulator = {
-    val source = (rawOpcode & 0x0f00) >> 8
-    val newDelayTimer = emulator.vRegister(source)
-    val newProgramCounter = emulator.programCounter + 2
-    emulator.copy(delayTimer = newDelayTimer, programCounter = newProgramCounter)
   }
 }

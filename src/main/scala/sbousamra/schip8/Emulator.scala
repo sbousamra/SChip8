@@ -1,5 +1,8 @@
 package sbousamra.schip8
 
+import org.newdawn.slick
+import org.newdawn.slick.Input
+
 import scala.annotation.tailrec
 import scala.runtime.RichInt
 import scala.util.Random
@@ -14,6 +17,7 @@ case class Emulator(
   soundTimer: Int,
   delayTimer: Int,
   keyInput: List[Int],
+  keyPressed: Option[Int],
   screen: Screen
 ) {
 
@@ -54,7 +58,7 @@ case class Emulator(
       case 0x2000 => Opcodes._2NNN(emulator, rawOpcode)
       case 0x3000 => Opcodes._3XKK(emulator, rawOpcode)
       case 0x4000 => Opcodes._4XKK(emulator, rawOpcode)
-//      case 0x5000 => Opcodes._5XYO(emulator)
+      case 0x5000 => Opcodes._5XY0(emulator, rawOpcode)
       case 0x6000 => Opcodes._6XKK(emulator, rawOpcode)
       case 0x7000 => Opcodes._7XKK(emulator, rawOpcode)
       case 0x8000 =>
@@ -78,15 +82,16 @@ case class Emulator(
       case 0xf000 =>
         val fDecodedOpcode = (rawOpcode & 0xf0ff)
         fDecodedOpcode match {
-          case 0xf01e => Opcodes._FX1E(emulator, rawOpcode)
-          case 0xf015 => Opcodes._FX15(emulator, rawOpcode)
           case 0xf007 => Opcodes._FX07(emulator, rawOpcode)
+          case 0xf00a => Opcodes._FX0A(emulator, rawOpcode)
+          case 0xf015 => Opcodes._FX15(emulator, rawOpcode)
+          case 0xf01e => Opcodes._FX1E(emulator, rawOpcode)
         }
       case 0xe000 =>
         val eDecodedOpcode = (rawOpcode & 0xf0ff)
         eDecodedOpcode match {
-          case 0xe0a1 => Opcodes._EXA1(emulator, rawOpcode)
           case 0xe09e => Opcodes._EX9E(emulator, rawOpcode)
+          case 0xe0a1 => Opcodes._EXA1(emulator, rawOpcode)
         }
     }
   }
@@ -105,6 +110,7 @@ object Emulator {
       soundTimer = 0,
       delayTimer = 0,
       keyInput = List.fill(16)(0),
+      keyPressed = None,
       screen = Screen.emptyScreen
     )
   }

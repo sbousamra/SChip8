@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 class OpcodesSpec extends FunSpec with Matchers {
 
   def getTestingEmulator: Emulator = {
-    Emulator(Memory.empty, 0, 0, List.fill(16)(0), List.fill(16)(0), 0, 0, 0, List.fill(16)(0), Screen.emptyScreen)
+    Emulator(Memory.empty, 0, 0, List.fill(16)(0), List.fill(16)(0), 0, 0, 0, List.fill(16)(0), None, Screen.emptyScreen)
   }
 
   describe("_00E0") {
