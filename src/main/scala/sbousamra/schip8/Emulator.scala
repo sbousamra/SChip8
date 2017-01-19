@@ -88,7 +88,9 @@ case class Emulator(
           case 0xf007 => Opcodes._FX07(emulator, rawOpcode)
           case 0xf00a => Opcodes._FX0A(emulator, rawOpcode)
           case 0xf015 => Opcodes._FX15(emulator, rawOpcode)
+          case 0xf018 => Opcodes._FX18(emulator, rawOpcode)
           case 0xf01e => Opcodes._FX1E(emulator, rawOpcode)
+          case 0xf029 => Opcodes._FX29(emulator, rawOpcode)
         }
       case 0xe000 =>
         val eDecodedOpcode = (rawOpcode & 0xf0ff)

@@ -289,6 +289,13 @@ object Opcodes {
     emulator.copy(delayTimer = newDelayTimer, programCounter = newProgramCounter)
   }
 
+  def _FX18(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val newSoundTimer = emulator.vRegister(source)
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(soundTimer = newSoundTimer, programCounter = newProgramCounter)
+  }
+
   def _FX1E(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
     val sourceRegister = emulator.vRegister(source)
@@ -301,5 +308,12 @@ object Opcodes {
       val newvRegister = emulator.vRegister.updated(0xf, 0)
       emulator.copy(vRegister = newvRegister, iRegister = newiRegister, programCounter = newProgramCounter)
     }
+  }
+
+  def _FX29(emulator: Emulator, rawOpcode: Int): Emulator = {
+    val source = (rawOpcode & 0x0f00) >> 8
+    val newiRegister = emulator.vRegister(source) * 5
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(iRegister = newiRegister, programCounter = newProgramCounter)
   }
 }

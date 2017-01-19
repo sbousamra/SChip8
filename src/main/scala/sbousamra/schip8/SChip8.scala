@@ -67,8 +67,8 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
       0
     }
     whichKeyIsPressed(container.getInput) match {
-      case Some(key) => emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer, keyInput = emulator.keyInput.updated(key, true)))
-      case None => emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer))
+      case Some(key) => emulator = emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer, keyInput = emulator.keyInput.updated(key, true)))
+      case None => emulator = emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer))
     }
   }
 
