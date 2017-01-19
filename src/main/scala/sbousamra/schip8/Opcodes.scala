@@ -248,7 +248,7 @@ object Opcodes {
       }
       case None => emulator.programCounter + 2
     }
-    emulator.copy(programCounter = newProgramCounter, keyPressed = None)
+    emulator.copy(programCounter = newProgramCounter, keyInput = List.fill(16)(false))
   }
 
   def _EXA1(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -261,7 +261,7 @@ object Opcodes {
       }
       case None => emulator.programCounter + 2
     }
-    emulator.copy(programCounter = newProgramCounter, keyPressed = None)
+    emulator.copy(programCounter = newProgramCounter, keyInput = List.fill(16)(false))
   }
 
   def _FX07(emulator: Emulator, rawOpcode: Int): Emulator = {
@@ -277,7 +277,7 @@ object Opcodes {
       case Some(key) =>
         val newvRegister = emulator.vRegister.updated(source, key)
         val newProgramCounter = emulator.programCounter + 2
-        emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter, keyPressed = None)
+        emulator.copy(vRegister = newvRegister, programCounter = newProgramCounter, keyInput = List.fill(16)(false))
       case None => emulator
     }
   }

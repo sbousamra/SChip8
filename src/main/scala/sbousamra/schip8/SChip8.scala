@@ -13,6 +13,44 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
     appgc.start()
   }
 
+  def whichKeyIsPressed(input: Input): Option[Int] = {
+    if (input.isKeyPressed(Input.KEY_1)) {
+      Some(0x1)
+    } else if (input.isKeyPressed(Input.KEY_2)) {
+      Some(0x2)
+    } else if (input.isKeyPressed(Input.KEY_3)) {
+      Some(0x3)
+    } else if (input.isKeyPressed(Input.KEY_4)) {
+      Some(0xC)
+    } else if (input.isKeyPressed(Input.KEY_Q)) {
+      Some(0x4)
+    } else if (input.isKeyPressed(Input.KEY_W)) {
+      Some(0x5)
+    } else if (input.isKeyPressed(Input.KEY_E)) {
+      Some(0x6)
+    } else if ((input.isKeyPressed(Input.KEY_R))) {
+      Some(0xD)
+    } else if ((input.isKeyPressed(Input.KEY_A))) {
+      Some(0x7)
+    } else if ((input.isKeyPressed(Input.KEY_S))) {
+      Some(0x8)
+    } else if ((input.isKeyPressed(Input.KEY_D))) {
+      Some(0x9)
+    } else if ((input.isKeyPressed(Input.KEY_F))) {
+      Some(0xE)
+    } else if ((input.isKeyPressed(Input.KEY_Z))) {
+      Some(0xA)
+    } else if ((input.isKeyPressed(Input.KEY_X))) {
+      Some(0x0)
+    } else if ((input.isKeyPressed(Input.KEY_C))) {
+      Some(0xB)
+    } else if ((input.isKeyPressed(Input.KEY_V))) {
+      Some(0xF)
+    } else {
+      None
+    }
+  }
+
   override def init(container: GameContainer): Unit = {
     // do nothing
   }
@@ -28,7 +66,10 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
     } else {
       0
     }
-    emulator = emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer))
+    whichKeyIsPressed(container.getInput) match {
+      case Some(key) => emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer, keyInput = emulator.keyInput.updated(key, true)))
+      case None => emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer))
+    }
   }
 
   override def render(container: GameContainer, g: Graphics): Unit = {

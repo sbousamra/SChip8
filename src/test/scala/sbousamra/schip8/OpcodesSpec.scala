@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 class OpcodesSpec extends FunSpec with Matchers {
 
   def getTestingEmulator: Emulator = {
-    Emulator(Memory.empty, 0, 0, List.fill(16)(0), List.fill(16)(0), 0, 0, 0, List.fill(16)(0), None, Screen.emptyScreen)
+    Emulator(Memory.empty, 0, 0, List.fill(16)(0), List.fill(16)(0), 0, 0, 0, List.fill(16)(false), Screen.emptyScreen)
   }
 
   describe("_00E0") {
@@ -247,12 +247,12 @@ class OpcodesSpec extends FunSpec with Matchers {
   }
 
   describe("_EX9E") {
-    it("should check the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2") {
-      val emulatorBefore = getTestingEmulator
-      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyPressed = Some(1), vRegister = emulatorBefore.vRegister.updated(1, 1))
-      val emulatorAfterKeyEqual = Opcodes._EX9E(emulatorBeforeKeyEqual, 0xE121)
-      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(keyPressed = Some(2), vRegister = emulatorBefore.vRegister.updated(1, 1))
-      val emulatorAfterKeyNotEqual = Opcodes._EX9E(emulatorBeforeKeyNotEqual, 0xE121)
+    it("should check the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2") {
+      val emulatorBefore = getTestingEmulator.copy(keyInput = List.fill(16)(false))
+      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(1, true), vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyEqual = Opcodes._EX9E(emulatorBeforeKeyEqual, 0xE19E)
+      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyNotEqual = Opcodes._EX9E(emulatorBeforeKeyNotEqual, 0xE19E)
       emulatorAfterKeyEqual.programCounter should be (emulatorBeforeKeyEqual.programCounter + 4)
       emulatorAfterKeyNotEqual.programCounter should be (emulatorBeforeKeyNotEqual.programCounter + 2)
     }
@@ -260,11 +260,11 @@ class OpcodesSpec extends FunSpec with Matchers {
 
   describe("_EXA1") {
     it("should check the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2") {
-      val emulatorBefore = getTestingEmulator
-      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyPressed = Some(1), vRegister = emulatorBefore.vRegister.updated(1, 1))
-      val emulatorAfterKeyEqual = Opcodes._EXA1(emulatorBeforeKeyEqual, 0xE121)
-      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(keyPressed = Some(2), vRegister = emulatorBefore.vRegister.updated(1, 1))
-      val emulatorAfterKeyNotEqual = Opcodes._EXA1(emulatorBeforeKeyNotEqual, 0xE121)
+      val emulatorBefore = getTestingEmulator.copy(keyInput = List.fill(16)(false))
+      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(1, true), vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyEqual = Opcodes._EXA1(emulatorBeforeKeyEqual, 0xE1A1)
+      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(2, true), vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyNotEqual = Opcodes._EXA1(emulatorBeforeKeyNotEqual, 0xE1A1)
       emulatorAfterKeyEqual.programCounter should be (emulatorBeforeKeyEqual.programCounter + 2)
       emulatorAfterKeyNotEqual.programCounter should be (emulatorBeforeKeyNotEqual.programCounter + 4)
     }
@@ -281,9 +281,9 @@ class OpcodesSpec extends FunSpec with Matchers {
 
   describe("_FX0A") {
     it("should stop all execution until a key is pressed, then the value of that key is stored in Vx") {
-      val emulatorBefore = getTestingEmulator
-      val emulatorBeforeKeyPressed = emulatorBefore.copy(keyPressed = Some(1), vRegister = emulatorBefore.vRegister.updated(0, 0))
-      val emulatorBeforeKeyNotPressed = emulatorBefore.copy(keyPressed = None, vRegister = emulatorBefore.vRegister.updated(0, 0))
+      val emulatorBefore = getTestingEmulator.copy(keyInput = List.fill(16)(false))
+      val emulatorBeforeKeyPressed = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(1, true), vRegister = emulatorBefore.vRegister.updated(0, 0))
+      val emulatorBeforeKeyNotPressed = emulatorBefore.copy(vRegister = emulatorBefore.vRegister.updated(0, 0))
       val emulatorAfterKeyPressed = Opcodes._FX0A(emulatorBeforeKeyPressed, 0xF00A)
       val emulatorAfterKeyNotPressed = Opcodes._FX0A(emulatorBeforeKeyNotPressed, 0xF00A)
       emulatorAfterKeyPressed.vRegister(0) should be (1)

@@ -16,8 +16,7 @@ case class Emulator(
   iRegister: Int,
   soundTimer: Int,
   delayTimer: Int,
-  keyInput: List[Int],
-  keyPressed: Option[Int],
+  keyInput: List[Boolean],
   screen: Screen
 ) {
 
@@ -42,6 +41,10 @@ case class Emulator(
 
   def getTopOfStack: Int = {
     stack.last
+  }
+
+  def keyPressed: Option[Int] = {
+    keyInput.zipWithIndex.find(key => key._1 == true).map(key => key._2)
   }
 
   def executeOpcode(emulator: Emulator): Emulator = {
@@ -109,8 +112,7 @@ object Emulator {
       iRegister = 0,
       soundTimer = 0,
       delayTimer = 0,
-      keyInput = List.fill(16)(0),
-      keyPressed = None,
+      keyInput = List.fill(16)(false),
       screen = Screen.emptyScreen
     )
   }
