@@ -246,27 +246,27 @@ class OpcodesSpec extends FunSpec with Matchers {
     }
   }
 
-  describe("_EXA1") {
+  describe("_EX9E") {
     it("should check the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2") {
       val emulatorBefore = getTestingEmulator
-      val emulatorBeforeKeyUp = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(emulatorBefore.vRegister(1), 0))
-      val emulatorAfterKeyUp = Opcodes._EXA1(emulatorBeforeKeyUp, 0xE121)
-      val emulatorBeforeKeyDown = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(emulatorBefore.vRegister(1), 2))
-      val emulatorAfterKeyDown = Opcodes._EXA1(emulatorBeforeKeyDown, 0xE121)
-      emulatorAfterKeyUp.programCounter should be (emulatorBeforeKeyUp.programCounter + 4)
-      emulatorAfterKeyDown.programCounter should be (emulatorBeforeKeyDown.programCounter + 2)
+      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyPressed = Some(1), vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyEqual = Opcodes._EX9E(emulatorBeforeKeyEqual, 0xE121)
+      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(keyPressed = Some(2), vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyNotEqual = Opcodes._EX9E(emulatorBeforeKeyNotEqual, 0xE121)
+      emulatorAfterKeyEqual.programCounter should be (emulatorBeforeKeyEqual.programCounter + 4)
+      emulatorAfterKeyNotEqual.programCounter should be (emulatorBeforeKeyNotEqual.programCounter + 2)
     }
   }
 
-  describe("_EX9E") {
-    it("should check the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2") {
+  describe("_EXA1") {
+    it("should check the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2") {
       val emulatorBefore = getTestingEmulator
-      val emulatorBeforeKeyUp = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(emulatorBefore.vRegister(1), 0))
-      val emulatorAfterKeyUp = Opcodes._EX9E(emulatorBeforeKeyUp, 0xE121)
-      val emulatorBeforeKeyDown = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(emulatorBefore.vRegister(1), 2))
-      val emulatorAfterKeyDown = Opcodes._EX9E(emulatorBeforeKeyDown, 0xE121)
-      emulatorAfterKeyDown.programCounter should be (emulatorBeforeKeyUp.programCounter + 4)
-      emulatorAfterKeyUp.programCounter should be (emulatorBeforeKeyDown.programCounter + 2)
+      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyPressed = Some(1), vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyEqual = Opcodes._EXA1(emulatorBeforeKeyEqual, 0xE121)
+      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(keyPressed = Some(2), vRegister = emulatorBefore.vRegister.updated(1, 1))
+      val emulatorAfterKeyNotEqual = Opcodes._EXA1(emulatorBeforeKeyNotEqual, 0xE121)
+      emulatorAfterKeyEqual.programCounter should be (emulatorBeforeKeyEqual.programCounter + 2)
+      emulatorAfterKeyNotEqual.programCounter should be (emulatorBeforeKeyNotEqual.programCounter + 4)
     }
   }
 
@@ -279,13 +279,19 @@ class OpcodesSpec extends FunSpec with Matchers {
     }
   }
 
-  describe("_FX1E") {
-    it("should add the values of I and Vx and the results are stored in the I register") {
-      val emulator = getTestingEmulator
-      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 10), iRegister = 5)
-      val emulatorAfter = Opcodes._FX1E(emulatorBefore, 0xf01e)
-      emulatorAfter.iRegister should be (emulatorBefore.iRegister + 10)
-      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+  describe("_FX0A") {
+    it("should stop all execution until a key is pressed, then the value of that key is stored in Vx") {
+      val emulatorBefore = getTestingEmulator
+      val emulatorBeforeKeyPressed = emulatorBefore.copy(keyPressed = Some(1), vRegister = emulatorBefore.vRegister.updated(0, 0))
+      val emulatorBeforeKeyNotPressed = emulatorBefore.copy(keyPressed = None, vRegister = emulatorBefore.vRegister.updated(0, 0))
+      val emulatorAfterKeyPressed = Opcodes._FX0A(emulatorBeforeKeyPressed, 0xF00A)
+      val emulatorAfterKeyNotPressed = Opcodes._FX0A(emulatorBeforeKeyNotPressed, 0xF00A)
+      emulatorAfterKeyPressed.vRegister(0) should be (1)
+      emulatorAfterKeyNotPressed.vRegister(0) should be (0)
+      emulatorAfterKeyPressed.programCounter should be (emulatorBeforeKeyPressed.programCounter + 2)
+      emulatorAfterKeyNotPressed.programCounter should be (emulatorBeforeKeyNotPressed.programCounter)
+      emulatorAfterKeyPressed.keyPressed should be (None)
+      emulatorAfterKeyNotPressed.keyPressed should be (None)
     }
   }
 
@@ -295,6 +301,16 @@ class OpcodesSpec extends FunSpec with Matchers {
       val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 20), delayTimer = 15)
       val emulatorAfter = Opcodes._FX15(emulatorBefore, 0xf015)
       emulatorAfter.delayTimer should be (emulatorBefore.vRegister(0))
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
+
+  describe("_FX1E") {
+    it("should add the values of I and Vx and the results are stored in the I register") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 10), iRegister = 5)
+      val emulatorAfter = Opcodes._FX1E(emulatorBefore, 0xf01e)
+      emulatorAfter.iRegister should be (emulatorBefore.iRegister + 10)
       emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
     }
   }
