@@ -5,7 +5,19 @@ import org.scalatest.{FunSpec, Matchers}
 class OpcodesSpec extends FunSpec with Matchers {
 
   def getTestingEmulator: Emulator = {
-    Emulator(Memory.empty, 0, 0, List.fill(16)(0), List.fill(16)(0), 0, 0, 0, List.fill(16)(false), Screen.emptyScreen)
+    Emulator(Memory(data = List.fill(4096)(0)), 0, 0, List.fill(16)(0), List.fill(16)(0), 0, 0, 0, List.fill(16)(false), Screen.emptyScreen)
+  }
+
+  def runTestOnTestingEmulator(specName: String)(f: Emulator => Unit): Unit = {
+    f(getTestingEmulator)
+  }
+
+  describe("example") {
+    runTestOnTestingEmulator("example") { emulatorBefore =>
+      val emulatorAfter = Opcodes._00E0(emulatorBefore, 0x00e0)
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+      emulatorAfter.screen.data should be (Screen.emptyScreen.data)
+    }
   }
 
   describe("_00E0") {
@@ -249,10 +261,10 @@ class OpcodesSpec extends FunSpec with Matchers {
   describe("_EX9E") {
     it("should check the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2") {
       val emulatorBefore = getTestingEmulator.copy(keyInput = List.fill(16)(false))
-      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(1, true), vRegister = emulatorBefore.vRegister.updated(1, 1))
-      val emulatorAfterKeyEqual = Opcodes._EX9E(emulatorBeforeKeyEqual, 0xE19E)
-      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(vRegister = emulatorBefore.vRegister.updated(1, 1))
-      val emulatorAfterKeyNotEqual = Opcodes._EX9E(emulatorBeforeKeyNotEqual, 0xE19E)
+      val emulatorBeforeKeyEqual = emulatorBefore.copy(keyInput = emulatorBefore.keyInput.updated(5, true), vRegister = emulatorBefore.vRegister.updated(3, 5))
+      val emulatorAfterKeyEqual = Opcodes._EX9E(emulatorBeforeKeyEqual, 0xE39E)
+      val emulatorBeforeKeyNotEqual = emulatorBefore.copy(vRegister = emulatorBefore.vRegister.updated(3, 5))
+      val emulatorAfterKeyNotEqual = Opcodes._EX9E(emulatorBeforeKeyNotEqual, 0xE39E)
       emulatorAfterKeyEqual.programCounter should be (emulatorBeforeKeyEqual.programCounter + 4)
       emulatorAfterKeyNotEqual.programCounter should be (emulatorBeforeKeyNotEqual.programCounter + 2)
     }
@@ -301,6 +313,38 @@ class OpcodesSpec extends FunSpec with Matchers {
       val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 20), delayTimer = 15)
       val emulatorAfter = Opcodes._FX15(emulatorBefore, 0xf015)
       emulatorAfter.delayTimer should be (emulatorBefore.vRegister(0))
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
+
+  describe("_FX18") {
+    it("should set ST equal to the value of Vx") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(soundTimer = 0, vRegister = emulator.vRegister.updated(0, 1))
+      val emulatorAfter = Opcodes._FX18(emulatorBefore, 0xf018)
+      emulatorAfter.soundTimer should be (1)
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
+
+  describe("_FX29") {
+    it("should set the value of I to the location for the hexadecimal sprite corresponding to the value of Vx") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 1))
+      val emulatorAfter = Opcodes._FX29(emulatorBefore, 0xf029)
+      emulatorAfter.iRegister should be (5)
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
+
+  describe("_FX33") {
+    it("should take the decimal value of Vx, and place the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 1))
+      val emulatorAfter = Opcodes._FX33(emulatorBefore, 0xf033)
+      emulatorAfter.memory.data(emulatorBefore.iRegister) should be (1/100)
+      emulatorAfter.memory.data(emulatorBefore.iRegister + 1) should be ((1 % 100)/10)
+      emulatorAfter.memory.data(emulatorBefore.iRegister + 2) should be ((1 % 100) % 10)
       emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
     }
   }

@@ -240,8 +240,9 @@ object Opcodes {
 
   def _EX9E(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
+    val vRegisterValue = emulator.vRegister(source)
     val newProgramCounter = emulator.keyPressed match {
-      case Some(key) => if (key == source) {
+      case Some(key) => if (key == vRegisterValue) {
         emulator.programCounter + 4
       } else {
         emulator.programCounter + 2
@@ -253,8 +254,9 @@ object Opcodes {
 
   def _EXA1(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
+    val vRegisterValue = emulator.vRegister(source)
     val newProgramCounter = emulator.keyPressed match {
-      case Some(key) => if (key != source) {
+      case Some(key) => if (key != vRegisterValue) {
         emulator.programCounter + 4
       } else {
         emulator.programCounter + 2
@@ -319,10 +321,10 @@ object Opcodes {
 
   def _FX33(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
-    val vRegisterDecimal = emulator.vRegister(source)
-    val newMemoryData = emulator.memory.data.updated(emulator.iRegister, (vRegisterDecimal/100))
-      .updated((emulator.iRegister + 1), ((vRegisterDecimal % 100)/10))
-      .updated((emulator.iRegister + 2), ((vRegisterDecimal % 100) % 10))
+    val vRegisterValue = emulator.vRegister(source)
+    val newMemoryData = emulator.memory.data.updated(emulator.iRegister, (vRegisterValue/100))
+      .updated((emulator.iRegister + 1), ((vRegisterValue % 100)/10))
+      .updated((emulator.iRegister + 2), ((vRegisterValue % 100) % 10))
     val newMemory = emulator.memory.copy(data = newMemoryData)
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(memory = newMemory, programCounter = newProgramCounter)

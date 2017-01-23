@@ -9,7 +9,7 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
     val appgc = new AppGameContainer(this)
     appgc.setDisplayMode(640, 480, false)
     appgc.setVSync(true)
-    appgc.setTargetFrameRate(60)
+    appgc.setTargetFrameRate(300)
     appgc.start()
   }
 
@@ -66,8 +66,12 @@ case class SChip8(var emulator: Emulator) extends BasicGame("schip8") {
     } else {
       0
     }
-    whichKeyIsPressed(container.getInput) match {
-      case Some(key) => emulator = emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer, keyInput = emulator.keyInput.updated(key, true)))
+    val input: Input = container.getInput
+    whichKeyIsPressed(input) match {
+      case Some(key) => {
+        println(key)
+        emulator = emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer, keyInput = emulator.keyInput.updated(key, true)))
+      }
       case None => emulator = emulator.executeOpcode(emulator.copy(soundTimer = newSoundTimer, delayTimer = newDelayTimer))
     }
   }
