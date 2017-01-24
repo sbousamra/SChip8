@@ -261,7 +261,7 @@ object Opcodes {
       } else {
         emulator.programCounter + 2
       }
-      case None => emulator.programCounter + 2
+      case None => emulator.programCounter + 4
     }
     emulator.copy(programCounter = newProgramCounter, keyInput = List.fill(16)(false))
   }
