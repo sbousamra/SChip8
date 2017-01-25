@@ -327,6 +327,16 @@ class OpcodesSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("_FX1E") {
+    it("should add the values of I and Vx and the results are stored in the I register") {
+      val emulator = getTestingEmulator
+      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 10), iRegister = 5)
+      val emulatorAfter = Opcodes._FX1E(emulatorBefore, 0xf01e)
+      emulatorAfter.iRegister should be (emulatorBefore.iRegister + 10)
+      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
+    }
+  }
+
   describe("_FX29") {
     it("should set the value of I to the location for the hexadecimal sprite corresponding to the value of Vx") {
       val emulator = getTestingEmulator
@@ -345,16 +355,6 @@ class OpcodesSpec extends FunSpec with Matchers {
       emulatorAfter.memory.data(emulatorBefore.iRegister) should be (1/100)
       emulatorAfter.memory.data(emulatorBefore.iRegister + 1) should be ((1 % 100)/10)
       emulatorAfter.memory.data(emulatorBefore.iRegister + 2) should be ((1 % 100) % 10)
-      emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
-    }
-  }
-
-  describe("_FX1E") {
-    it("should add the values of I and Vx and the results are stored in the I register") {
-      val emulator = getTestingEmulator
-      val emulatorBefore = emulator.copy(vRegister = emulator.vRegister.updated(0, 10), iRegister = 5)
-      val emulatorAfter = Opcodes._FX1E(emulatorBefore, 0xf01e)
-      emulatorAfter.iRegister should be (emulatorBefore.iRegister + 10)
       emulatorAfter.programCounter should be (emulatorBefore.programCounter + 2)
     }
   }
