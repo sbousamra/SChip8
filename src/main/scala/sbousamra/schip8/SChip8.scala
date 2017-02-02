@@ -94,8 +94,6 @@ object SChip8 {
 
   def main(args: Array[String]) {
     val slick2d = create("TETRIS").run
-//    val emulatorTest = create("TETRIS").emulator.run
-//    emulatorTest
   }
 
   def create(romName: String): SChip8 = {
