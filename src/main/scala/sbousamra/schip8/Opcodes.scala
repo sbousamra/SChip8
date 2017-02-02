@@ -337,4 +337,8 @@ object Opcodes {
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(memory = newMemory, programCounter = newProgramCounter)
   }
+
+  def _FX65(emulator: Emulator, rawOpcode: Int): Emulator = {
+    ???
+  }
 }

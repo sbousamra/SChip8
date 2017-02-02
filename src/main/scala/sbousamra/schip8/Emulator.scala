@@ -80,8 +80,14 @@ case class Emulator(
       case 0x9000 => Opcodes._9XY0(emulator, rawOpcode)
       case 0xa000 => Opcodes._ANNN(emulator, rawOpcode)
       case 0xb000 => Opcodes._BNNN(emulator, rawOpcode)
-      case 0xd000 => Opcodes._DXYN(emulator, rawOpcode)
       case 0xc000 => Opcodes._CXKK(emulator, rawOpcode, Random.nextInt(256))
+      case 0xd000 => Opcodes._DXYN(emulator, rawOpcode)
+      case 0xe000 =>
+        val eDecodedOpcode = (rawOpcode & 0xf0ff)
+        eDecodedOpcode match {
+          case 0xe09e => Opcodes._EX9E(emulator, rawOpcode)
+          case 0xe0a1 => Opcodes._EXA1(emulator, rawOpcode)
+        }
       case 0xf000 =>
         val fDecodedOpcode = (rawOpcode & 0xf0ff)
         fDecodedOpcode match {
@@ -93,12 +99,6 @@ case class Emulator(
           case 0xf029 => Opcodes._FX29(emulator, rawOpcode)
           case 0xf033 => Opcodes._FX33(emulator, rawOpcode)
           case 0xf055 => Opcodes._FX55(emulator, rawOpcode)
-        }
-      case 0xe000 =>
-        val eDecodedOpcode = (rawOpcode & 0xf0ff)
-        eDecodedOpcode match {
-          case 0xe09e => Opcodes._EX9E(emulator, rawOpcode)
-          case 0xe0a1 => Opcodes._EXA1(emulator, rawOpcode)
         }
     }
   }
