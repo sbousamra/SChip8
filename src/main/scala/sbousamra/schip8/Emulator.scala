@@ -99,6 +99,7 @@ case class Emulator(
           case 0xf029 => Opcodes._FX29(emulator, rawOpcode)
           case 0xf033 => Opcodes._FX33(emulator, rawOpcode)
           case 0xf055 => Opcodes._FX55(emulator, rawOpcode)
+          case 0xf065 => Opcodes._FX65(emulator, rawOpcode)
         }
     }
   }

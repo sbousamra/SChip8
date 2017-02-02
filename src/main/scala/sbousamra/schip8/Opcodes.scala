@@ -332,13 +332,16 @@ object Opcodes {
 
   def _FX55(emulator: Emulator, rawOpcode: Int): Emulator = {
     val source = (rawOpcode & 0x0f00) >> 8
-    val updatedMemoryData = emulator.memory.data.patch(emulator.iRegister, emulator.vRegister.slice(0, source), source)
+    val updatedMemoryData = emulator.memory.data.patch(emulator.iRegister, emulator.vRegister.slice(0, source + 1), source)
     val newMemory = emulator.memory.copy(updatedMemoryData)
     val newProgramCounter = emulator.programCounter + 2
     emulator.copy(memory = newMemory, programCounter = newProgramCounter)
   }
 
   def _FX65(emulator: Emulator, rawOpcode: Int): Emulator = {
-    ???
+    val source = (rawOpcode & 0x0f00) >> 8
+    val updatedvRegister = emulator.vRegister.patch(0, emulator.memory.data.slice(emulator.iRegister, (emulator.iRegister + source + 1)), source)
+    val newProgramCounter = emulator.programCounter + 2
+    emulator.copy(vRegister = updatedvRegister, programCounter = newProgramCounter)
   }
 }
